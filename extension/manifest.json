@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "KeepTradeCut Values",
+    "name": "KeepTradeCut Sleeper Values",
     "version": "1.0",
     "description": "Add KeepTradeCut player values to the Sleeper website.",
     "icons": {
