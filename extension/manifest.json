@@ -16,11 +16,14 @@
             "run_at": "document_end"
         }
     ],
-    "permissions": [
-        "storage"
-    ],
+    "action": {
+        "default_popup": "/options/options.html"
+    },
     "options_ui": {
         "page": "/options/options.html",
         "open_in_tab": false
-    }
+    },
+    "permissions": [
+        "storage"
+    ]
 }

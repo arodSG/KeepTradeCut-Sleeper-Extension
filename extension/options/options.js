@@ -21,6 +21,16 @@ const saveOptions = () => {
     );
 };
 
+document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+        saveOption(e.target.id, e.target.checked);
+    });
+});
+
+const saveOption = (key, value) => {
+    chrome.storage.sync.set({ [key]: value} );
+};
+
 // Restores select box and checkbox state using the preferences stored in chrome.storage.
 const restoreOptions = () => {
     chrome.storage.sync.get(
@@ -37,4 +47,3 @@ const restoreOptions = () => {
 };
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
-document.getElementById('save').addEventListener('click', saveOptions);

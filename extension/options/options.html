@@ -2,54 +2,59 @@
 <html>
     <head>
         <title>KeepTradeCut Values Extension Options</title>
+        <link rel="stylesheet" href="options.css">
     </head>
     <body>
-        <div>Show KeepTradeCut values on:</div>
+        <h2>Show KeepTradeCut values on:</h2>
         
-        <div>
-            <label>
-                <input type="checkbox" id="playerModalEnabled" />
-                Player popups
-            </label>
-        </div>
-        
-        <div>
-            <label>
-                <input type="checkbox" id="matchupPlayersEnabled" />
-                Matchup tab + popups
-            </label>
-        </div>
-        
-        <div>
-            <label>
-                <input type="checkbox" id="teamPanelEnabled" />
-                Team tab
-            </label>
-        </div>
-        
-        <div>
-            <label>
-                <input type="checkbox" id="trendPanelEnabled" />
-                Trend tab
-            </label>
-        </div>
-        
-        <div>
-            <label>
-                <input type="checkbox" id="tradesPanelEnabled" />
-                Trades tab + popups
-            </label>
-        </div>
-        
-        <div>
-            <label>
-                <input type="checkbox" id="leagueChatEnabled" />
-                League Chat
-            </label>
-        </div>
+        <div id="options">
+            <div class="option-container">
+                <span class="option-label float-left">Player popups</span>
+                <label class="switch float-right">
+                    <input type="checkbox" id="playerModalEnabled" />
+                    <span class="slider round"></span>
+                </label>
+            </div>
 
-        <div>
-            <button id="save">Save</button> <span id="status"></span>
+            <div class="option-container">
+                <span class="option-label float-left">Matchup tab + popups</span>
+                <label class="switch float-right">
+                    <input type="checkbox" id="matchupPlayersEnabled" />
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="option-container">
+                <span class="option-label float-left">Team tab</span>
+                <label class="switch float-right">
+                    <input type="checkbox" id="teamPanelEnabled" />
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="option-container">
+                <span class="option-label float-left">Trend tab</span>
+                <label class="switch float-right">
+                    <input type="checkbox" id="trendPanelEnabled" />
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="option-container">
+                <span class="option-label float-left">Trades tab + popups</span>
+                <label class="switch float-right">
+                    <input type="checkbox" id="tradesPanelEnabled" />
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="option-container">
+                <span class="option-label float-left">League Chat</span>
+                <label class="switch float-right">
+                    <input type="checkbox" id="leagueChatEnabled" />
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
 
         <script src="options.js"></script>

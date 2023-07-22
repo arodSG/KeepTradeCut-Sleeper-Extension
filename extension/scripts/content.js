@@ -164,6 +164,7 @@ function initHandlers() {
 
 function loadExtensionSettings() {
     chrome.storage.sync.get(
+        { playerModalEnabled: true, matchupPlayersEnabled: true, teamPanelEnabled: true, trendPanelEnabled: true, tradesPanelEnabled: true, leagueChatEnabled: true },
         (items) => {
             settings = items;
         }
