@@ -456,7 +456,7 @@ function getPlayerValue(playerId) {
         }
     }
     
-    return playerValue !== null ? playerValue : 'N/A';
+    return playerValue != null ? playerValue : 'N/A';
 }
 
 function handleChatPlayerInfo(playerInfoContainer) {
