@@ -1,37 +1,52 @@
 // When window URL changes, call Sleeper API to get league info using league id from URL. Check if league is dynasty ("type":2) and if league is superflex ("roster_positions":[].includes('SUPER_FLEX')) to determine which values to use.
 
 let playersJson = {};
-let idToMetaText = {};
-let leagueIdTest = '';
-
-fetch('https://arodsg.com/KTCValues/players.json')
-    .then(response => {
-        response.json().then(json => {
-            playersJson = json;
-        });
-    })
-    .catch(error => {
-        console.log(error);
-    });
-
 let settings = {};
-const leagueInfo = {};
+let leagueInfo = {};
+let leagueId;
+let observer;
+let loadingPromises = [];
 
 loadExtensionSettings();
 
-let observer;
-
 document.addEventListener('readystatechange', e => {
     if(document.readyState === 'complete') {
-        getLeagueInfo();
-        
-        document.querySelectorAll('.nav-league-item-wrapper').forEach(leagueItemWrapper => {
-            leagueItemWrapper.addEventListener('click', e => {
-                getLeagueInfo();
+        chrome.storage.session.get(['leagueInfo', 'playersJson'], (storage) => {
+            if(storage.playersJson) {
+                playersJson = storage.playersJson;
+            }
+            else {
+                getPlayersJson();
+            }
+            
+            if(storage.leagueInfo) {
+                leagueInfo = storage.leagueInfo;
+            }
+            
+            getLeagueInfo();
+            
+            document.querySelectorAll('.nav-league-item-wrapper').forEach(leagueItemWrapper => {
+                leagueItemWrapper.addEventListener('click', e => {
+                    getLeagueInfo();
+                });
             });
         });
     }
 });
+
+function getPlayersJson() {
+    loadingPromises.push(fetch('https://arodsg.com/KTCValues/players.json')
+        .then(async function(response) {
+            await response.json().then(json => {
+                playersJson = json;
+                chrome.storage.session.set({ playersJson });
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    );
+}
 
 function getLeagueIdFromUrl() {
     const windowUrl = window.location.href;
@@ -46,21 +61,32 @@ function getLeagueInfo() {
     }
     
     setTimeout(() => {
-        const leagueId = getLeagueIdFromUrl();
-
+        leagueId = getLeagueIdFromUrl();
+        
         if(leagueId) {
-            leagueInfoPromise = fetch(`https://api.sleeper.app/v1/league/${leagueId}`)
-                .then(response => {
-                    response.json().then(json => {
-                        leagueInfo.isDynasty = json.settings.type === 2;
-                        leagueInfo.isSuperflex = json.roster_positions.includes('SUPER_FLEX');
-                        initHandlers();
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            if(!leagueInfo.leagueId) {
+                loadingPromises.push(
+                    fetch(`https://api.sleeper.app/v1/league/${leagueId}`)
+                        .then(async function(response) {
+                            await response.json().then(json => {
+                                leagueInfo[leagueId] = {
+                                    isDynasty: json.settings.type === 2,
+                                    isSuperflex: json.roster_positions.includes('SUPER_FLEX')
+                                };
+                                chrome.storage.session.set({ leagueInfo });
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        })
+                );
+            }
         }
+        
+        Promise.all(loadingPromises).then(() => {
+            loadingPromises = [];
+            initHandlers();
+        });
     }, 0);
 }
 
@@ -202,7 +228,7 @@ function handlePlayerModal() {
 
                 ktcValueRankItem.style.cursor = 'pointer';
                 ktcValueRankItem.onclick = function() {
-                    const url = `https://keeptradecut.com/${leagueInfo.isDynasty ? 'dynasty' : 'fantasy'}-rankings/players/${playerInfo.ktc_url}?format=${leagueInfo.isSuperflex ? '2' : '1'}`;
+                    const url = `https://keeptradecut.com/${leagueInfo[leagueId].isDynasty ? 'dynasty' : 'fantasy'}-rankings/players/${playerInfo.ktc_url}?format=${leagueInfo[leagueId].isSuperflex ? '2' : '1'}`;
                     window.open(url, '_blank');
                 };
             }
@@ -390,7 +416,7 @@ function updateTradeButtonLink() {
             }
         }
         
-        const ktcURL = `https://keeptradecut.com/trade-calculator?teamOne=${receivePlayerIds.join('|')}&teamTwo=${sendPlayerIds.join('|')}&format=${leagueInfo.isSuperflex ? '2' : '1'}`;
+        const ktcURL = `https://keeptradecut.com/trade-calculator?teamOne=${receivePlayerIds.join('|')}&teamTwo=${sendPlayerIds.join('|')}&format=${leagueInfo[leagueId].isSuperflex ? '2' : '1'}`;
         viewOnKTCButton.onclick = () => { window.open(ktcURL, '_blank') };
     }
 }
@@ -448,11 +474,11 @@ function getPlayerValue(playerId) {
     if(playerId in playersJson) {
         const playerInfo = playersJson[playerId];
 
-        if(leagueInfo.isDynasty) {
-            playerValue = leagueInfo.isSuperflex ? playerInfo.dynasty_superflex_value : playerInfo.dynasty_one_qb_value;
+        if(leagueInfo[leagueId].isDynasty) {
+            playerValue = leagueInfo[leagueId].isSuperflex ? playerInfo.dynasty_superflex_value : playerInfo.dynasty_one_qb_value;
         }
         else {
-            playerValue =  leagueInfo.isSuperflex ? playerInfo.fantasy_superflex_value : playerInfo.fantasy_one_qb_value;
+            playerValue =  leagueInfo[leagueId].isSuperflex ? playerInfo.fantasy_superflex_value : playerInfo.fantasy_one_qb_value;
         }
     }
     
