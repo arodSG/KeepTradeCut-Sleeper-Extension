@@ -17,6 +17,11 @@ jobs:
           extensionDir: 'extension'
           zipFilePath: 'keeptradecut-sleeper-values.zip'
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: keeptradecut-sleeper-values.zip
+          path: keeptradecut-sleeper-values.zip
+
       - uses: cardinalby/webext-buildtools-chrome-crx-action@v2
         with:
           zipFilePath: 'keeptradecut-sleeper-values.zip'
