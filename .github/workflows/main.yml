@@ -9,6 +9,8 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      
       - id: packExtensionDir
         uses: cardinalby/webext-buildtools-pack-extension-dir-action@v1
         with:
