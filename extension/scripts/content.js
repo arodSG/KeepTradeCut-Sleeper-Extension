@@ -11,9 +11,11 @@ loadExtensionSettings();
 
 document.addEventListener('readystatechange', e => {
     if(document.readyState === 'complete') {
-        chrome.storage.session.get(['leagueInfo', 'playersJson'], (storage) => {
-            if(storage.playersJson) {
-                playersJson = storage.playersJson;
+        chrome.storage.session.get(['leagueInfo', 'json'], (storage) => {
+            if(storage.json && storage.json.players) {
+                const json = storage.json;
+                playersJson = json.players;
+                console.log('player info retrieved from session storage, last updated ' + json.lastUpdated);
             }
             else {
                 getPlayersJson();
@@ -35,11 +37,12 @@ document.addEventListener('readystatechange', e => {
 });
 
 function getPlayersJson() {
-    loadingPromises.push(fetch('https://arodsg.com/KTCValues/players.json')
+    loadingPromises.push(fetch('https://arodsg.com/KTCValues/players.json', { cache: 'no-store' })
         .then(async function(response) {
             await response.json().then(json => {
-                playersJson = json;
-                chrome.storage.session.set({ playersJson });
+                playersJson = json.players;
+                chrome.storage.session.set({ json });
+                console.log('player info retrieved from API, last updated ' + json.lastUpdated);
             });
         })
         .catch(error => {
