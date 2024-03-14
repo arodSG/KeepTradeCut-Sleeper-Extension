@@ -1,5 +1,3 @@
-// When window URL changes, call Sleeper API to get league info using league id from URL. Check if league is dynasty ("type":2) and if league is superflex ("roster_positions":[].includes('SUPER_FLEX')) to determine which values to use.
-
 let playersJson = {};
 let settings = {};
 let leagueInfo = {};
@@ -15,7 +13,7 @@ document.addEventListener('readystatechange', e => {
             if(storage.json && storage.json.players) {
                 const json = storage.json;
                 playersJson = json.players;
-                console.log('player info retrieved from session storage, last updated ' + json.lastUpdated);
+                console.log('KTC info retrieved from session storage, last updated ' + json.lastUpdated);
             }
             else {
                 getPlayersJson();
@@ -42,7 +40,7 @@ function getPlayersJson() {
             await response.json().then(json => {
                 playersJson = json.players;
                 chrome.storage.session.set({ json });
-                console.log('player info retrieved from API, last updated ' + json.lastUpdated);
+                console.log('KTC info retrieved, last updated ' + json.lastUpdated);
             });
         })
         .catch(error => {
